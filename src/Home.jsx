@@ -1,10 +1,20 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
+    const blogs = [
+        {
+            title: "hello world",
+            content: "hello",
+            created_at: '12-07-24'
+        }
+    ]
+
     const [posts, setPosts] = useState([])
+    
     useEffect(() => {
-        axios.get('https://newsapi.org/v2/everything?q=tesla&from=2024-05-04&sortBy=publishedAt&apiKey=201657a8ea1e494d84c4a6fb73c623af')
+        axios.get('https://newsapi.org/v2/everything?q=tesla&from=2024-07-16&sortBy=publishedAt&apiKey=201657a8ea1e494d84c4a6fb73c623af')
         .then(function (response) {
             // handle success
             setPosts(response.data.articles)
@@ -41,6 +51,22 @@ export default function Home() {
             <i className="fas fa-bars" />
             </button>
             <div className="collapse navbar-collapse" id="navbarResponsive">
+                <Link to="/blog/create" style={{ textDecoration: 'none' }}>
+                    <button
+                        style={{
+                        backgroundColor: 'blue',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px 20px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        }}
+                    >
+                        Create Blog
+                    </button>
+                </Link>
+
             <ul className="navbar-nav ms-auto py-4 py-lg-0">
                 <li className="nav-item">
                 <a className="nav-link px-lg-3 py-3 py-lg-4" href="index.html">
@@ -87,10 +113,11 @@ export default function Home() {
         <div className="row gx-4 gx-lg-5 justify-content-center">
             <div className="col-md-10 col-lg-8 col-xl-7">
             {/* Post preview*/}
-            {posts.map((post) =>
+            {blogs.map((post) =>
                 <>
                     <div className="post-preview">
-                    <a href="post.html">
+                    <Link to={`blog/${post.title}`}>Your Name</Link>
+                    <a href={`blog/${post.title}`}>
                         <h2 className="post-title">
                             {post.title}
                         </h2>
