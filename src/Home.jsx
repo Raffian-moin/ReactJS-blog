@@ -3,13 +3,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Home() {
-    const blogs = [
-        {
-            title: "hello world",
-            content: "hello",
-            created_at: "12-07-24",
-        },
-    ];
+
+    const JsonBlogs = localStorage.getItem('blogs');
+    const blogs = JSON.parse(JsonBlogs);
 
     const [posts, setPosts] = useState([]);
 

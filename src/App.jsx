@@ -5,7 +5,7 @@ import
         createBrowserRouter,
         RouterProvider,
     } from "react-router-dom";
-import Blog from './Blog';
+import BlogDetails from './BlogDetails';
 import CreateBlog from "./CreateBlog";
 import EditBlog from "./EditBlog";
 import Home from './Home';
@@ -18,7 +18,7 @@ function App() {
         },
         {
             path: "blog/:title",
-            element: <Blog />,
+            element: <BlogDetails />,
         },
         {
             path: "blog/create",

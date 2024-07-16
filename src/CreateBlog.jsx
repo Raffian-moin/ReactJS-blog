@@ -42,7 +42,29 @@ export default function CreateBlog() {
 
     const [value, setValue] = useState("");
 
-    const onSubmit = (data) => console.log(data, value);
+    const onSubmit = (data) => {
+      let blogs = []
+      if (localStorage.getItem('blogs')) {
+        const JsonBlogs = localStorage.getItem('blogs');
+        blogs = JSON.parse(JsonBlogs);
+        let last_elements_index = blogs.length
+        blogs.push({
+          id: last_elements_index,
+          title: 'last',
+          content: 'content'
+        })
+      } else {
+        blogs = [
+          {
+            id: 1,
+            title: 'sfs',
+            content: 'sfsf'
+          }
+        ]
+      }
+
+      localStorage.setItem('blogs', JSON.stringify(blogs));
+    };
 
     return (
       <>
