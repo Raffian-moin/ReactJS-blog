@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+import ReactPaginate from 'react-paginate';
+// import './assets/paginate.css'
 
 export default function Home() {
     const JsonBlogs = localStorage.getItem('blogs');
@@ -130,49 +133,11 @@ export default function Home() {
             {/* Main Content*/}
             <div className="container px-4 px-lg-5">
                 <div className="row gx-4 gx-lg-5 justify-content-center">
-                    <div className="col-md-10 col-lg-8 col-xl-7">
-                        {/* Post preview*/}
-                        {blogs.map((post) => (
-                            <>
-                                <div className="post-preview">
-                                    <Link to={`blog/${post.title}`}>
-                                        Your Name
-                                    </Link>
-                                    <a href={`blog/${post.id}`}>
-                                        <h2 className="post-title">
-                                            {post.title}
-                                        </h2>
-                                        <h3 className="post-subtitle">
-                                            Problems look mighty small from 150
-                                            miles up
-                                        </h3>
-                                    </a>
-                                    <p className="post-meta">
-                                        Posted by
-                                        <a href="#!">Start Bootstrap</a>
-                                        on {post.publishedAt}
-                                    </p>
-                                    <Link to={`blog/edit/${post.title}`}>
-                                        Edit
-                                    </Link>
-                                </div>
-                                {/* Divider*/}
-                                <hr className="my-4" />
-                            </>
-                        ))}
-                        {/* Pager*/}
-                        <div className="d-flex justify-content-end mb-4">
-                            <a
-                                className="btn btn-primary text-uppercase"
-                                href="#!"
-                            >
-                                Older Posts →
-                            </a>
-                        </div>
-                    </div>
+
                 </div>
             </div>
-            {/* Footer*/}
+            <div id="container"></div>
+            <PaginatedItems itemsPerPage={1} items={blogs} />
             <footer className="border-top">
                 <div className="container px-4 px-lg-5">
                     <div className="row gx-4 gx-lg-5 justify-content-center">
@@ -213,3 +178,88 @@ export default function Home() {
         </>
     );
 }
+
+function PaginatedItems({ itemsPerPage, items }) {
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+    // const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const endOffset = itemOffset + itemsPerPage;
+    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+    const currentItems = items.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(items.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % items.length;
+        console.log(
+            `User requested page number ${event.selected}, which is offset ${newOffset}`,
+        );
+        setItemOffset(newOffset);
+    };
+
+    return (
+        <>
+            <div className="col-md-10 col-lg-8 col-xl-7">
+                {/* Post preview*/}
+                {currentItems.map((post) => (
+                    <>
+                        <div className="post-preview">
+                            <Link to={`blog/${post.title}`}>Your Name</Link>
+                            <a href={`blog/${post.id}`}>
+                                <h2 className="post-title">{post.title}</h2>
+                                <h3 className="post-subtitle">
+                                    Problems look mighty small from 150 miles up
+                                </h3>
+                            </a>
+                            <p className="post-meta">
+                                Posted by
+                                <a href="#!">Start Bootstrap</a>
+                                on {post.publishedAt}
+                            </p>
+                            <Link to={`blog/edit/${post.title}`}>Edit</Link>
+                        </div>
+                        {/* Divider*/}
+                        <hr className="my-4" />
+                    </>
+                ))}
+                {/* Pager*/}
+                <div className="d-flex justify-content-end mb-4">
+                    <a className="btn btn-primary text-uppercase" href="#!">
+                        Older Posts →
+                    </a>
+                </div>
+            </div>
+            <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={5}
+                pageCount={pageCount}
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                marginPagesDisplayed={2}
+                containerClassName="pagination"
+                activeClassName="active"
+            />
+        </>
+    );
+}
+
+// Add a <div id="container"> to your HTML to see the component rendered.
+// ReactDOM.render(
+//     <PaginatedItems itemsPerPage={4} />,
+//     document.getElementById('container'),
+// );
