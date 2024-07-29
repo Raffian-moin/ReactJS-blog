@@ -1,9 +1,8 @@
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import 'react-quill/dist/quill.snow.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import BlogForm from './BlogForm';
-import { useParams } from 'react-router-dom';
 
 export default function CreateBlog() {
     const [blogContent, setBlogContent] = useState('');
@@ -27,10 +26,16 @@ export default function CreateBlog() {
         });
 
         localStorage.setItem('blogs', JSON.stringify(blogs));
+        setBlogContent("");
+
+        toast.success('Success Notification !');
     };
 
     return (
         <>
+            <div>
+                <ToastContainer />
+            </div>
             <nav className="navbar navbar-expand-lg navbar-light" id="mainNav">
                 <div className="container px-4 px-lg-5">
                     <a className="navbar-brand" href="index.html">
