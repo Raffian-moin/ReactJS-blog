@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,28 +8,20 @@ import BlogForm from './BlogForm';
 export default function CreateBlog() {
     const [blogContent, setBlogContent] = useState('');
 
-
-
     const onSubmit = (data) => {
-        console.log(data);
-        let blogs = [];
-        let id = 1;
-        if (localStorage.getItem('blogs')) {
-            const JsonBlogs = localStorage.getItem('blogs');
-            blogs = JSON.parse(JsonBlogs);
-            id = blogs.length;
-        }
-
-        blogs.push({
-            id: id,
+        axios.post('http://127.0.0.1:8000/api/posts/store', {
             title: data.title,
             content: blogContent,
+        })
+        .then(function (response) {
+            toast.success('Blog post successfully saved!');
+            console.log(response);
+            setBlogContent("");
+        })
+        .catch(function (error) {
+            console.log(error);
         });
 
-        localStorage.setItem('blogs', JSON.stringify(blogs));
-        setBlogContent("");
-
-        toast.success('Success Notification !');
     };
 
     return (

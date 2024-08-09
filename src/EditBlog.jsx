@@ -1,15 +1,38 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CreateBlog() {
+    const { id } = useParams();
+
+    const [post, setPost] = useState('');
+
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:8000/api/posts/edit/${id}`)
+        .then(function (response) {
+            setPost(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+        .finally(function () {});
+    }, []);
+
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            title: post?.title,
+        },
+    });
 
     const modules = {
         toolbar: [
@@ -40,29 +63,29 @@ export default function CreateBlog() {
         'image',
     ];
 
-    const [blogContent, setBlogContent] = useState('');
+    const [blogContent, setBlogContent] = useState('<b>ok tor mar heda</b>');
+    const [QuillDefaultValue, SetQuillDefaultValue] = useState('kitao');
 
     const onSubmit = (data) => {
-        console.log(data);
-        let blogs = [];
-        let id = 1;
-        if (localStorage.getItem('blogs')) {
-            const JsonBlogs = localStorage.getItem('blogs');
-            blogs = JSON.parse(JsonBlogs);
-            id = blogs.length;
-        }
-
-        blogs.push({
-            id: id,
+        axios.put(`http://127.0.0.1:8000/api/posts/update/${id}`, {
             title: data.title,
             content: blogContent,
+        })
+        .then(function (response) {
+            console.log(response);
+            setBlogContent("");
+            toast.success('Blog post updated successfully!');
+        })
+        .catch(function (error) {
+            console.log(error);
         });
-
-        localStorage.setItem('blogs', JSON.stringify(blogs));
     };
 
     return (
         <>
+            <div>
+                <ToastContainer />
+            </div>
             <nav className="navbar navbar-expand-lg navbar-light" id="mainNav">
                 <div className="container px-4 px-lg-5">
                     <a className="navbar-brand" href="index.html">
@@ -177,7 +200,6 @@ export default function CreateBlog() {
                         <ReactQuill
                             theme="snow"
                             value={blogContent}
-                            onChange={setBlogContent}
                             modules={modules}
                             formats={formats}
                         />

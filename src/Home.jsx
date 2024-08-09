@@ -1,15 +1,10 @@
+import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import ReactDOM from 'react-dom';
 import ReactPaginate from 'react-paginate';
-// import './assets/paginate.css'
-import { GoogleLogin } from '@react-oauth/google';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
-    const JsonBlogs = localStorage.getItem('blogs');
-    const blogs = JSON.parse(JsonBlogs);
-
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -251,7 +246,7 @@ function PaginatedItems({ itemsPerPage, items }) {
                                 <a href="#!">Start Bootstrap</a>
                                 on {post.publishedAt}
                             </p>
-                            <Link to={`blog/edit/${post.title}`}>Edit</Link>
+                            <Link to={`blog/edit/${post.id}`}>Edit</Link>
                         </div>
                         {/* Divider*/}
                         <hr className="my-4" />
