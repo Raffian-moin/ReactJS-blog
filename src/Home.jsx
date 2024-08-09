@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import ReactPaginate from 'react-paginate';
 // import './assets/paginate.css'
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function Home() {
     const JsonBlogs = localStorage.getItem('blogs');
@@ -72,7 +73,36 @@ export default function Home() {
                                 Create Blog
                             </button>
                         </Link>
+                        <GoogleLogin
+                            onSuccess={(credentialResponse) => {
+                                var base64Url =
+                                    credentialResponse.credential.split('.')[1];
+                                var base64 = base64Url
+                                    .replace(/-/g, '+')
+                                    .replace(/_/g, '/');
+                                var jsonPayload = decodeURIComponent(
+                                    window
+                                        .atob(base64)
+                                        .split('')
+                                        .map(function (c) {
+                                            return (
+                                                '%' +
+                                                (
+                                                    '00' +
+                                                    c.charCodeAt(0).toString(16)
+                                                ).slice(-2)
+                                            );
+                                        })
+                                        .join(''),
+                                );
 
+                                console.log(credentialResponse);
+                                console.log(JSON.parse(jsonPayload));
+                            }}
+                            onError={() => {
+                                console.log('Login Failed');
+                            }}
+                        />
                         <ul className="navbar-nav ms-auto py-4 py-lg-0">
                             <li className="nav-item">
                                 <a
