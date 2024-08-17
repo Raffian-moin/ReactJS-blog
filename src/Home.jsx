@@ -7,33 +7,91 @@ import { Link } from 'react-router-dom';
 export default function Home() {
     const [posts, setPosts] = useState([]);
 
+    const fetchData = async () => {
+        try {
+            axios
+                .get('http://127.0.0.1:8000/api/posts')
+                .then(function (response) {
+                    // handle success
+                    setPosts(response.data);
+                    // setTest(response.data);
+                    console.log(response.data);
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+                .finally(function () {
+                    // always executed
+                });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+
+
     useEffect(() => {
-        axios
-            .get(
-                'https://newsapi.org/v2/everything?q=tesla&from=2024-07-16&sortBy=publishedAt&apiKey=201657a8ea1e494d84c4a6fb73c623af',
-            )
+
+        fetchData();
+
+        // Call the async function
+    }, []);
+
+    const handleBookmarkBlog = (post_id) => {
+        let userId = 1;
+
+        axios.post(`http://127.0.0.1:8000/api/bookmarks/store/${userId}`, {
+            post_id: 5000,
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    };
+
+    const handleGoogleSignIn = (credentialResponse) => {
+        let base64Url = credentialResponse.credential.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(
+            window
+                .atob(base64)
+                .split('')
+                .map(function (c) {
+                    return (
+                        '%' +
+                        ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                    );
+                })
+                .join(''),
+        );
+
+        axios.post(`http://127.0.0.1:8000/api/auth/login`, {
+                clientId: credentialResponse.clientId,
+                credential: credentialResponse.credential,
+                payload: JSON.parse(jsonPayload),
+            })
             .then(function (response) {
-                // handle success
-                setPosts(response.data.articles);
-                console.log(response.data.articles);
+                console.log(response);
             })
             .catch(function (error) {
-                // handle error
                 console.log(error);
-            })
-            .finally(function () {
-                // always executed
             });
-    }, []);
+
+        console.log(credentialResponse);
+        console.log(JSON.parse(jsonPayload));
+    };
 
     return (
         <>
             {/* Navigation*/}
             <nav className="navbar navbar-expand-lg navbar-light" id="mainNav">
                 <div className="container px-4 px-lg-5">
-                    <a className="navbar-brand" href="index.html">
+                    <Link className="navbar-brand" to="/">
                         Start Bootstrap
-                    </a>
+                    </Link>
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -50,86 +108,139 @@ export default function Home() {
                         className="collapse navbar-collapse"
                         id="navbarResponsive"
                     >
-                        <Link
-                            to="/blog/create"
-                            style={{ textDecoration: 'none' }}
-                        >
-                            <button
-                                style={{
-                                    backgroundColor: 'blue',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '10px 20px',
-                                    borderRadius: '5px',
-                                    cursor: 'pointer',
-                                    fontSize: '16px',
-                                }}
-                            >
-                                Create Blog
-                            </button>
-                        </Link>
-                        <GoogleLogin
-                            onSuccess={(credentialResponse) => {
-                                var base64Url =
-                                    credentialResponse.credential.split('.')[1];
-                                var base64 = base64Url
-                                    .replace(/-/g, '+')
-                                    .replace(/_/g, '/');
-                                var jsonPayload = decodeURIComponent(
-                                    window
-                                        .atob(base64)
-                                        .split('')
-                                        .map(function (c) {
-                                            return (
-                                                '%' +
-                                                (
-                                                    '00' +
-                                                    c.charCodeAt(0).toString(16)
-                                                ).slice(-2)
-                                            );
-                                        })
-                                        .join(''),
-                                );
-
-                                console.log(credentialResponse);
-                                console.log(JSON.parse(jsonPayload));
-                            }}
-                            onError={() => {
-                                console.log('Login Failed');
-                            }}
-                        />
+                        <ul className="navbar-nav me-auto">
+                            <li className="nav-item">
+                                <Link
+                                    to="/blog/create"
+                                    className="nav-link"
+                                    style={{ textDecoration: 'none' }}
+                                >
+                                    <button
+                                        style={{
+                                            backgroundColor: 'blue',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '10px 20px',
+                                            borderRadius: '5px',
+                                            cursor: 'pointer',
+                                            fontSize: '16px',
+                                        }}
+                                    >
+                                        Create Blog
+                                    </button>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSignIn}
+                                    onError={() => {
+                                        console.log('Login Failed');
+                                    }}
+                                />
+                            </li>
+                        </ul>
                         <ul className="navbar-nav ms-auto py-4 py-lg-0">
                             <li className="nav-item">
-                                <a
+                                <Link
                                     className="nav-link px-lg-3 py-3 py-lg-4"
-                                    href="index.html"
+                                    to="/"
                                 >
                                     Home
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a
+                                <Link
                                     className="nav-link px-lg-3 py-3 py-lg-4"
-                                    href="about.html"
+                                    to="/about"
                                 >
                                     About
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a
+                                <Link
                                     className="nav-link px-lg-3 py-3 py-lg-4"
-                                    href="post.html"
+                                    to="/post"
                                 >
                                     Sample Post
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a
+                                <Link
                                     className="nav-link px-lg-3 py-3 py-lg-4"
-                                    href="contact.html"
+                                    to="/contact"
                                 >
                                     Contact
+                                </Link>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <a
+                                    className="nav-link dropdown-toggle"
+                                    href="#"
+                                    id="navbarDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    style={{
+                                        backgroundColor: '#f8f9fa',
+                                        borderRadius: '50%',
+                                        width: '40px',
+                                        height: '40px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: '#007bff',
+                                    }}
+                                >
+                                    <i className="bi bi-person-circle"></i>
                                 </a>
+                                <ul
+                                    className="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="navbarDropdown"
+                                >
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/dashboard"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/create-post"
+                                        >
+                                            Create Post
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/reading-list"
+                                        >
+                                            Reading list
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/settings"
+                                        >
+                                            Settings
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <hr className="dropdown-divider" />
+                                    </li>
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/sign-out"
+                                        >
+                                            Sign Out
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </div>
@@ -157,12 +268,14 @@ export default function Home() {
             </header>
             {/* Main Content*/}
             <div className="container px-4 px-lg-5">
-                <div className="row gx-4 gx-lg-5 justify-content-center">
-
-                </div>
+                <div className="row gx-4 gx-lg-5 justify-content-center"></div>
             </div>
             <div id="container"></div>
-            <PaginatedItems itemsPerPage={1} items={blogs} />
+            <PaginatedItems
+                itemsPerPage={1}
+                items={posts}
+                handleBookmarkBlog={handleBookmarkBlog}
+            />
             <footer className="border-top">
                 <div className="container px-4 px-lg-5">
                     <div className="row gx-4 gx-lg-5 justify-content-center">
@@ -204,7 +317,7 @@ export default function Home() {
     );
 }
 
-function PaginatedItems({ itemsPerPage, items }) {
+function PaginatedItems({ itemsPerPage, items, handleBookmarkBlog }) {
     // Here we use item offsets; we could also use page offsets
     // following the API or data you're working with.
     const [itemOffset, setItemOffset] = useState(0);
@@ -214,7 +327,7 @@ function PaginatedItems({ itemsPerPage, items }) {
     // (This could be items from props; or items loaded in a local state
     // from an API endpoint with useEffect and useState)
     const endOffset = itemOffset + itemsPerPage;
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+    // console.log(`Loading items from ${itemOffset} to ${endOffset}`);
     const currentItems = items.slice(itemOffset, endOffset);
     const pageCount = Math.ceil(items.length / itemsPerPage);
 
@@ -232,7 +345,7 @@ function PaginatedItems({ itemsPerPage, items }) {
             <div className="col-md-10 col-lg-8 col-xl-7">
                 {/* Post preview*/}
                 {currentItems.map((post) => (
-                    <>
+                    <div key={post.id}>
                         <div className="post-preview">
                             <Link to={`blog/${post.title}`}>Your Name</Link>
                             <a href={`blog/${post.id}`}>
@@ -247,10 +360,21 @@ function PaginatedItems({ itemsPerPage, items }) {
                                 on {post.publishedAt}
                             </p>
                             <Link to={`blog/edit/${post.id}`}>Edit</Link>
+
+                            <button
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    padding: 0,
+                                }}
+                                onClick={() => handleBookmarkBlog(post.id)}
+                            >
+                                <i className="fa-regular fa-bookmark ml-5"></i>
+                            </button>
                         </div>
                         {/* Divider*/}
                         <hr className="my-4" />
-                    </>
+                    </div>
                 ))}
                 {/* Pager*/}
                 <div className="d-flex justify-content-end mb-4">
